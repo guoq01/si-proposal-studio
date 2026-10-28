@@ -1,0 +1,33 @@
+{
+  "mode": "auto",
+  "language": "en",
+  "journal": {
+    "full_name": "",
+    "abbr": "",
+    "url_scope": "",
+    "special_rules": ""
+  },
+  "si_title_draft": "",
+  "research_topic": "",
+  "core_scientific_gaps": "",
+  "keywords": [],
+  "guest_editors": [
+    {
+      "name": "",
+      "affiliation": "",
+      "bio": "",
+      "org_experience": ""
+    }
+  ],
+  "intended_timeline": {
+    "milestones": [],
+    "status": "tentative"
+  },
+  "source_community": "",
+  "expected_submissions": null,
+  "user_constraints": "",
+  "source_proposal": "",
+  "editor_feedback": [],
+  "deliverables": [],
+  "include_cfp": false
+}

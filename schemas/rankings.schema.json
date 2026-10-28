@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/si-proposal-studio/rankings.schema.json",
+  "type": "object",
+  "properties": {
+    "rankings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sample_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "semantic_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "sample_id",
+          "semantic_score",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "cfp_rankings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sample_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "semantic_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "sample_id",
+          "semantic_score",
+          "reason"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "candidate_digest": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "rankings",
+    "candidate_digest"
+  ],
+  "additionalProperties": false
+}

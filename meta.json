@@ -1,0 +1,22 @@
+{
+  "name": "si-proposal-studio",
+  "version": "1.1.1",
+  "language_default": "en",
+  "modes": [
+    "draft",
+    "revise",
+    "derive"
+  ],
+  "private_samples": 0,
+  "type_a": 0,
+  "type_b": 0,
+  "verified_journal_records": 0,
+  "slots": [
+    "FEW_SHOT_STYLE_EXAMPLES",
+    "JOURNAL_STANDARD_TEMPLATE"
+  ],
+  "priority": "verified journal requirements > private style",
+  "retrieval": "parallel bank reads; separate host semantic Proposal/CfP rankings; request/source-bound context",
+  "runtime": "Python 3 standard library; Codex/host LLM semantic work and official-source browsing when available",
+  "distribution": "public-framework-empty-banks"
+}

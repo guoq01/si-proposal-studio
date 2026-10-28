@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/si-proposal-studio/private.schema.json",
+  "type": "object",
+  "properties": {
+    "sample_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sample_type": {
+      "type": "string",
+      "enum": [
+        "A",
+        "B"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "proposal_paradigm_file": {
+      "type": "string",
+      "minLength": 1
+    },
+    "retrieval": {
+      "type": "object",
+      "properties": {
+        "proposal_eligible": {
+          "type": "boolean"
+        },
+        "cfp_style_eligible": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "proposal_eligible",
+        "cfp_style_eligible"
+      ],
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "sample_id",
+    "sample_type",
+    "title",
+    "keywords",
+    "proposal_paradigm_file",
+    "retrieval"
+  ],
+  "additionalProperties": true
+}

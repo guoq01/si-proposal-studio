@@ -1,0 +1,15 @@
+{
+  "version": "1.1.1",
+  "distribution": "public-framework-empty-banks",
+  "behavior_tests": {
+    "passed": 38,
+    "failed": 0,
+    "fixtures": "Wholly synthetic temporary banks; no private samples"
+  },
+  "skill_structure": "passed quick_validate.py",
+  "public_scaffold": "passed check_public.py",
+  "private_samples_distributed": 0,
+  "official_journal_records": 0,
+  "external_fact_verification": "Not performed; official sources must be supplied separately",
+  "limitations": "Structural tests do not certify source authenticity or semantic truth"
+}

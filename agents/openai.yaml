@@ -1,0 +1,6 @@
+interface:
+  display_name: "SI Proposal Studio"
+  short_description: "Draft SI proposals with separate style and journal banks"
+  default_prompt: "Use $si-proposal-studio to prepare a journal-compliant SI proposal from my private examples and verified journal requirements."
+policy:
+  allow_implicit_invocation: true
