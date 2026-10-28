@@ -53,10 +53,75 @@ def route(req):
 def digest(value):
     return hashlib.sha256(json.dumps(value,sort_keys=True,ensure_ascii=False,allow_nan=False).encode()).hexdigest()
 
+def draft_stage(req):
+    if not isinstance(req,dict) or route(req)!='draft': return 'write'
+    explicit=req.get('draft_stage','auto')
+    if explicit in ('discover','write'): return explicit
+    return 'write' if any(req.get(k) for k in ('si_title_draft','research_topic','core_scientific_gaps')) or req.get('source_proposal') else 'discover'
+
+def request_schema(req):
+    return schema('discovery-input' if draft_stage(req)=='discover' else 'input')
+
+def prepare_discovery(bank,req,today):
+    errors=input_errors(req)
+    if errors: return {'mode':route(req),'draft_stage':'discover','status':'blocked','missing_inputs':errors}
+    # Both independent banks are inspected; journal absence is a research task, not a discovery blocker.
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+        a=pool.submit(style_candidates,bank,req); b=pool.submit(standards,bank,req,today)
+        profiles=a.result(); standard=b.result()
+    return {'mode':'draft','draft_stage':'discover','status':'research_required','request_digest':digest(req),
+        'journal_standard':standard,'private_profiles':profiles,
+        'research_plan':['Resolve exact journal identity and official scope','Verify SI instructions and archive active/forthcoming/past official calls','Investigate recent primary research and unanswered questions','Compare candidate problems, methods and applications to nearest historical SIs','Return evidence-backed candidates for user selection'],
+        'lookback_years':req.get('discovery_preferences',{}).get('lookback_years',5),
+        'note':'Host must browse or obtain dated source snapshots. Profiles describe prior examples, not confirmed expertise or topic rankings. No proposal is generated; research evidence stays in task work files.'}
+
+def check_discovery(req,out,today):
+    errors=input_errors(req)+validate(out,schema('discovery-output'))
+    if errors: return {'status':'fail','errors':errors}
+    if today is None: return {'status':'fail','errors':['Current date required']}
+    if out['request_digest']!=digest(req): errors.append('Discovery request changed')
+    if out['language']!=req.get('language','en'): errors.append('Output language mismatch')
+    sources={x['id']:x for x in out['sources']}
+    if len(sources)!=len(out['sources']): errors.append('Duplicate source IDs')
+    for row in out['sources']+out['search_log']:
+        if not row['url'].startswith(('https://','http://')): errors.append('Source/search URL required')
+        try:
+            if dt.date.fromisoformat(row['checked_on'])>today: errors.append('Future research date')
+        except ValueError: errors.append('Invalid research date')
+    scope_ids=out['journal_identity']['scope_source_ids']
+    if any(i not in sources or sources[i]['kind']!='official_scope' for i in scope_ids): errors.append('Journal identity needs official scope evidence')
+    issues={x['id']:x for x in out['historical_issues']}
+    if len(issues)!=len(out['historical_issues']): errors.append('Duplicate historical issue IDs')
+    for issue in issues.values():
+        if any(i not in sources or sources[i]['kind']!='official_si' for i in issue['source_ids']): errors.append('Historical SI needs official source')
+    ids=[x['id'] for x in out['candidates']]
+    if len(ids)!=len(set(ids)): errors.append('Duplicate candidate IDs')
+    for c in out['candidates']:
+        if any(i not in sources or sources[i]['kind']!='primary_research' for i in c['research_source_ids']): errors.append('Candidate needs primary research evidence')
+        compared=[x['issue_id'] for x in c['comparisons']]
+        if any(i not in issues for i in compared) or len(compared)!=len(set(compared)): errors.append('Invalid comparator IDs')
+        if issues and not compared: errors.append('Candidate missing nearest historical SI comparison')
+        if not issues and (not out['coverage']['no_match_explanation'].strip() or c['overlap_risk']!='unknown'): errors.append('No historical match requires unknown overlap risk and coverage explanation')
+    if out['status']=='awaiting_topic_selection':
+        if not scope_ids or not all(out['journal_identity'][k].strip() for k in ('full_name','abbr')): errors.append('Resolve journal identity and scope before topic selection')
+        if req['journal'].get('abbr') and norm(req['journal']['abbr'])!=norm(out['journal_identity']['abbr']): errors.append('Discovery journal abbreviation mismatch; normalize aliases before research')
+        categories={x['category'] for x in out['search_log']}
+        if not {'scope','guidelines','active_si','forthcoming_si','past_si','research'}<=categories: errors.append('Research search coverage incomplete')
+        count=len(out['candidates']); desired=req.get('discovery_preferences',{}).get('candidate_count',3)
+        if not 1<=count<=5 or count<desired and not out['coverage']['fewer_candidates_reason'].strip(): errors.append('Need requested candidate count or evidence-based shortage explanation')
+        if out['coverage']['lookback_years']!=req.get('discovery_preferences',{}).get('lookback_years',5): errors.append('Research lookback mismatch')
+    return {'status':'fail' if errors else 'mechanical_checks_pass','errors':errors,'limitation':'Host must verify journal identity, source truth, nearest-neighbor selection and coverage. No absolute non-overlap certification.'}
+
 def input_errors(req):
-    e=validate(req,schema('input'))
+    e=validate(req,request_schema(req))
     if e: return e  # Never traverse malformed values after validation failure.
     mode=route(req)
+    if req.get('draft_stage')=='discover' and mode!='draft': e.append('Discovery belongs only to Draft mode')
+    if draft_stage(req)=='discover':
+        if not any(req['journal'].get(k,'').strip() for k in ('full_name','abbr')): e.append('Exact target journal name or abbreviation required')
+        if any(norm(req['journal'].get(k,'')) in ('iet','ieee','unknown','tbd') for k in ('full_name','abbr')): e.append('Publisher alone is ambiguous; provide exact journal')
+        if req.get('editor_feedback'): e.append('Editor feedback conflicts with discovery')
+        return e
     def unknowns(v,path='$'):
         if isinstance(v,str) and v.strip().casefold() in ('unknown','tbd','to be confirmed','待确认','未知'):
             e.append(path+': unresolved input')
@@ -199,6 +264,7 @@ def standards(bank,req,today):
     return {'status':'blocked' if e else 'ready','record':rec,'errors':e}
 
 def prepare(bank,req,today):
+    if draft_stage(req)=='discover': return prepare_discovery(bank,req,today)
     e=input_errors(req)
     if validate(req,schema('input')):
         return {'mode':route(req),'status':'blocked','missing_inputs':e,'journal_standard':{'status':'not_checked'},'style_candidates':[],'candidate_digest':digest([])}
@@ -210,6 +276,7 @@ def prepare(bank,req,today):
       'ranking_instruction':'Score all Proposal candidates and separately all eligible Type A CfP candidates; copy candidate_digest. Scores are retrieval relevance only, never proposal grades.'}
 
 def compile_context(bank,req,ranks,today):
+    if draft_stage(req)=='discover': return prepare_discovery(bank,req,today)
     prep=prepare(bank,req,today)
     if validate(req,schema('input')): return {'status':'blocked','mode':route(req),'missing_inputs':prep['missing_inputs'],'slots':{}}
     candidates=prep['style_candidates']; e=validate(ranks,schema('rankings'))
@@ -246,6 +313,7 @@ def compile_context(bank,req,ranks,today):
       'remaining_host_gates':['official source refresh if needed','recent same-journal SI overlap audit','scope breadth assessment','factual evidence verification','semantic journal-rule check']}
 
 def check_output(req,ctx,out,today=None,bank=None):
+    if draft_stage(req)=='discover': return check_discovery(req,out,today)
     e=input_errors(req)+validate(out,schema('output')); notes=[]
     if validate(out,schema('output')) or not isinstance(ctx,dict):
         return {'status':'fail','errors':e or ['Malformed context'],'manual_checks':[]}
@@ -429,14 +497,14 @@ def main():
     ap=argparse.ArgumentParser(); ap.add_argument('--bank',type=Path,default=ROOT/'banks'); sub=ap.add_subparsers(dest='cmd',required=True)
     for name in ('prepare','compile'):
         a=sub.add_parser(name); a.add_argument('--request',required=True); a.add_argument('--today',required=True); a.add_argument('--out',required=True)
-        if name=='compile': a.add_argument('--rankings',required=True)
-    a=sub.add_parser('check'); a.add_argument('--today',required=True); a.add_argument('--request',required=True); a.add_argument('--context',required=True); a.add_argument('--output',required=True); a.add_argument('--out',required=True)
+        if name=='compile': a.add_argument('--rankings')
+    a=sub.add_parser('check'); a.add_argument('--today',required=True); a.add_argument('--request',required=True); a.add_argument('--context'); a.add_argument('--output',required=True); a.add_argument('--out',required=True)
     a=sub.add_parser('ingest'); a.add_argument('--kind',choices=['X','Y'],required=True); a.add_argument('--source',required=True)
     args=ap.parse_args()
     try:
         if args.cmd=='prepare': result=prepare(args.bank,read(args.request),dt.date.fromisoformat(args.today))
-        elif args.cmd=='compile': result=compile_context(args.bank,read(args.request),read(args.rankings),dt.date.fromisoformat(args.today))
-        elif args.cmd=='check': result=check_output(read(args.request),read(args.context),read(args.output),dt.date.fromisoformat(args.today),args.bank)
+        elif args.cmd=='compile': result=compile_context(args.bank,read(args.request),read(args.rankings) if args.rankings else {},dt.date.fromisoformat(args.today))
+        elif args.cmd=='check': result=check_output(read(args.request),read(args.context) if args.context else {},read(args.output),dt.date.fromisoformat(args.today),args.bank)
         else: result=ingest(args.bank,args.kind,args.source)
         if hasattr(args,'out'): dump(args.out,result)
         else: print(json.dumps(result,ensure_ascii=False,indent=2))

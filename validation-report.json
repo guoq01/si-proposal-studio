@@ -1,8 +1,8 @@
 {
-  "version": "1.1.1",
+  "version": "1.2.0",
   "distribution": "public-framework-empty-banks",
   "behavior_tests": {
-    "passed": 38,
+    "passed": 49,
     "failed": 0,
     "fixtures": "Wholly synthetic temporary banks; no private samples"
   },
@@ -11,5 +11,7 @@
   "private_samples_distributed": 0,
   "official_journal_records": 0,
   "external_fact_verification": "Not performed; official sources must be supplied separately",
-  "limitations": "Structural tests do not certify source authenticity or semantic truth"
+  "limitations": "Structural tests do not certify source authenticity or semantic truth",
+  "discovery_cli_smoke": "Journal-only request returned research_required with missing standards; no full-writing inputs required",
+  "research_execution": "Not a live journal research run; semantic/source verification remains with host"
 }

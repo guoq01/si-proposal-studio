@@ -178,4 +178,48 @@ class Tests(unittest.TestCase):
  def test_safe_path_rejects_escape(self):
   with self.assertRaises(ValueError): si.safe(self.bank,'../../secret')
 
+ def discovery_request(self): return {'mode':'draft','journal':{'abbr':'TEST'}}
+ def discovery_output(self,req):
+  sources=[{'id':i,'url':'https://example.invalid/'+i,'title':'Synthetic '+i,'kind':kind,'checked_on':'2026-10-28','finding':'Synthetic evidence'} for i,kind in [('scope','official_scope'),('si','official_si'),('paper','primary_research')]]
+  candidate={'id':'c1','title':'Synthetic candidate','scientific_question':'Synthetic question','why_now':'Synthetic evidence-based timing','journal_fit':'Synthetic scope fit','topics':['Synthetic topic'],'scope_risk':'Bounded in fixture','community_feasibility':'Potential community, no commitments','research_source_ids':['paper'],'comparisons':[{'issue_id':'si1','shared_problem':'Fixture overlap','shared_methods':'Fixture overlap','shared_applications':'Fixture overlap','difference':'Fixture distinction','residual_risk':'Coverage limited'}],'overlap_risk':'medium','recommendation':'Discuss before drafting'}
+  return {'mode':'draft','draft_stage':'discover','status':'awaiting_topic_selection','request_digest':si.digest(req),'language':'en','journal_identity':{'full_name':'Example Test Journal','abbr':'TEST','scope_source_ids':['scope']},'sources':sources,'search_log':[{'query':'Synthetic search','url':'https://example.invalid/search','checked_on':'2026-10-28','category':c,'result':'Synthetic result'} for c in ('scope','guidelines','active_si','forthcoming_si','past_si','research')],'coverage':{'lookback_years':5,'limitations':['Synthetic fixture, not live research'],'no_match_explanation':'','fewer_candidates_reason':'Only one synthetic candidate in this test'},'historical_issues':[{'id':'si1','title':'Synthetic old SI','status':'published','period':'2025','scope':'Synthetic scope','source_ids':['si']}],'candidates':[candidate],'unresolved_questions':[],'next_action':'Ask user to select or refine topic; do not write Proposal yet'}
+ def test_journal_only_starts_discovery_without_ge(self):
+  req=self.discovery_request(); result=si.prepare(self.bank,req,TODAY)
+  self.assertEqual(result['mode'],'draft'); self.assertEqual(result['status'],'research_required'); self.assertEqual(result['journal_standard']['status'],'missing')
+  self.assertEqual(si.compile_context(self.bank,req,{},TODAY)['status'],'research_required')
+ def test_explicit_write_still_requires_full_inputs(self):
+  req=self.discovery_request(); req['draft_stage']='write'
+  self.assertEqual(si.prepare(self.bank,req,TODAY)['status'],'blocked')
+ def test_publisher_only_discovery_blocked(self):
+  req=self.discovery_request(); req['journal']['abbr']='IET'
+  self.assertEqual(si.prepare(self.bank,req,TODAY)['status'],'blocked')
+ def test_discovery_does_not_override_revision(self):
+  req=request(); req.update(mode='revise',draft_stage='discover',source_proposal='source',editor_feedback=[{'id':'E1','comment':'Fix'}])
+  self.assertTrue(si.input_errors(req))
+ def test_discovery_positive_traceability(self):
+  req=self.discovery_request(); self.assertEqual(si.check_output(req,{},self.discovery_output(req),TODAY,self.bank)['status'],'mechanical_checks_pass')
+ def test_discovery_no_history_cannot_claim_low_overlap(self):
+  req=self.discovery_request(); out=self.discovery_output(req); out['historical_issues']=[]; out['candidates'][0]['comparisons']=[]; out['candidates'][0]['overlap_risk']='low'
+  self.assertEqual(si.check_discovery(req,out,TODAY)['status'],'fail')
+  out['candidates'][0]['overlap_risk']='unknown'; out['coverage']['no_match_explanation']='No official calls found in synthetic search boundary'
+  self.assertEqual(si.check_discovery(req,out,TODAY)['status'],'mechanical_checks_pass')
+ def test_discovery_requires_primary_evidence(self):
+  req=self.discovery_request(); out=self.discovery_output(req); out['candidates'][0]['research_source_ids']=['scope']
+  self.assertEqual(si.check_discovery(req,out,TODAY)['status'],'fail')
+ def test_discovery_search_coverage_gate(self):
+  req=self.discovery_request(); out=self.discovery_output(req); out['search_log']=[]
+  self.assertEqual(si.check_discovery(req,out,TODAY)['status'],'fail')
+ def test_discovery_request_and_dates_bound(self):
+  req=self.discovery_request(); out=self.discovery_output(req); out['request_digest']='stale'; out['sources'][0]['checked_on']='2099-01-01'
+  self.assertGreaterEqual(len(si.check_discovery(req,out,TODAY)['errors']),2)
+ def test_discovery_cannot_release_proposal_artifacts(self):
+  req=self.discovery_request(); out=self.discovery_output(req); out['artifacts']=[{'kind':'proposal'}]
+  self.assertEqual(si.check_discovery(req,out,TODAY)['status'],'fail')
+
+ def test_discovery_incomplete_needs_no_invented_sources(self):
+  req=self.discovery_request(); out=self.discovery_output(req)
+  out.update(status='research_incomplete',sources=[],search_log=[],historical_issues=[],candidates=[],journal_identity={'full_name':'','abbr':'TEST','scope_source_ids':[]},unresolved_questions=['Need official source access'])
+  self.assertEqual(si.check_discovery(req,out,TODAY)['status'],'mechanical_checks_pass')
+  out['status']='awaiting_topic_selection'; self.assertEqual(si.check_discovery(req,out,TODAY)['status'],'fail')
+
 if __name__=='__main__': unittest.main(verbosity=2)

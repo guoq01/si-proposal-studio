@@ -1,5 +1,7 @@
 # SI input collection form
 
+Start with only the exact target journal for topic discovery. All remaining fields below are formal-writing intake fields and must not block initial research. Use templates/discovery-request.json; optional preferences are research domains/exclusions and search window. After the user selects a candidate, reuse supported research findings and collect missing writing facts.
+
 - Mode: auto / draft / revise / derive
 - Language: English (default) / Chinese
 - Journal full name:

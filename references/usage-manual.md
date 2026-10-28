@@ -23,7 +23,7 @@ python3 scripts/si.py --bank /absolute/private/bank ingest --kind Y --source /ab
 `ingest` validates structure and writes the appropriate independent bank. It cannot authenticate a website or a human assertion. Set pending if unverified. Use a versioned ID for updates and explicitly retire the former active index entry after preserving its record. Two active matching entries block retrieval. Avoid simultaneous bank writers. No private document is reclassified into an official source just because it quotes a rule.
 
 ## Draft / revise / derive
-Natural-language requests are normalized to schemas/input.schema.json. Mode 1: “Draft a new SI proposal for [exact journal].” Mode 2: “Revise this proposal against these editor comments.” Mode 3: “Generate a CfP and EiC cover letter from this proposal.” English is default; specify Chinese for a Chinese draft. Full required data may be resolved from a confirmed source rather than asked again.
+Journal-only requests use schemas/discovery-input.schema.json and the [topic-discovery workflow](topic-discovery.md). Formal writing requests use schemas/input.schema.json. Mode 1: “Draft a new SI proposal for [exact journal].” Mode 2: “Revise this proposal against these editor comments.” Mode 3: “Generate a CfP and EiC cover letter from this proposal.” English is default; specify Chinese for a Chinese draft. Full required data may be resolved from a confirmed source rather than asked again.
 
 Run from the Skill folder (replace paths and date with your actual request and user-local date):
 
@@ -60,3 +60,9 @@ To compute the artifact hash for a host-reviewed rule or rendered limit, import 
 Run check with the current user-local date and the SAME bank used for prepare/compile. Changed inputs, changed active rules, unresolved mandatory rules, blank required sections, pending manual counts, unmapped facts and unresolved editor issues prevent ready status. Structured validation is not a standalone review/score function.
 
 Journal updates must retain original snapshots and explicit override provenance. `required_section` rules are enforced in addition to the ordered format; source IDs, section sets, ranges and dates are validated on both ingestion and retrieval. Unknown counting methods remain manual instead of silently using an unsuitable tokenizer. Inputs marked pending/unknown are never promoted to verified by ingestion.
+
+## Version 1.2: start with a journal only
+
+Say: “使用 $si-proposal-studio。我准备向 IEEE TNSM 提交SI，目前只有目标期刊。请先调研官方要求、历史及正在征稿的SI和近期研究进展，提出3–5个候选主题，说明依据、最接近的历史SI及重叠风险。先与我确定选题，再补齐起草信息。”
+
+Discovery is a phase of Draft. No GE, timeline or invented scientific gap is needed to begin. See [topic discovery](topic-discovery.md) for the minimal schema, source-linked candidate report, prepare/check commands and user-confirmed handoff. Both banks retain their original roles; task research notes do not become a third bank. The public package remains empty of private material.

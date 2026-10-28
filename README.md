@@ -25,3 +25,7 @@ python3 scripts/test_si.py
 python3 scripts/check_public.py
 ```
 Tests generate artificial fixtures inside temporary directories. They require no personal samples. A passing result checks program behavior, not factual truth or current journal compliance. Missing official standards block drafting; empty style banks produce a disclosed limitation.
+
+## Start with only a target journal
+
+Invoke `$si-proposal-studio` and name the journal. Draft now includes a [topic-discovery phase](references/topic-discovery.md): research official rules, past/current SI calls and recent primary research; discuss 3–5 evidence-backed candidate themes before collecting full Proposal inputs. New topics are compared by scientific content, not title alone. No absolute non-overlap guarantee is made.

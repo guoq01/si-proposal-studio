@@ -1,0 +1,377 @@
+{
+  "type": "object",
+  "properties": {
+    "mode": {
+      "type": "string",
+      "enum": [
+        "draft"
+      ]
+    },
+    "draft_stage": {
+      "type": "string",
+      "enum": [
+        "discover"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "research_incomplete",
+        "awaiting_topic_selection"
+      ]
+    },
+    "request_digest": {
+      "type": "string",
+      "minLength": 1
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "en",
+        "zh"
+      ]
+    },
+    "journal_identity": {
+      "type": "object",
+      "properties": {
+        "full_name": {
+          "type": "string"
+        },
+        "abbr": {
+          "type": "string"
+        },
+        "scope_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "full_name",
+        "abbr",
+        "scope_source_ids"
+      ],
+      "additionalProperties": false
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "official_scope",
+              "official_guideline",
+              "official_si",
+              "primary_research"
+            ]
+          },
+          "checked_on": {
+            "type": "string",
+            "minLength": 1
+          },
+          "finding": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "title",
+          "kind",
+          "checked_on",
+          "finding"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "search_log": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string",
+            "minLength": 1
+          },
+          "checked_on": {
+            "type": "string",
+            "minLength": 1
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "scope",
+              "guidelines",
+              "active_si",
+              "forthcoming_si",
+              "past_si",
+              "research"
+            ]
+          },
+          "result": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "query",
+          "url",
+          "checked_on",
+          "category",
+          "result"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "properties": {
+        "lookback_years": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "no_match_explanation": {
+          "type": "string"
+        },
+        "fewer_candidates_reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "lookback_years",
+        "limitations",
+        "no_match_explanation",
+        "fewer_candidates_reason"
+      ],
+      "additionalProperties": false
+    },
+    "historical_issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "forthcoming",
+              "published",
+              "unknown"
+            ]
+          },
+          "period": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scope": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "status",
+          "period",
+          "scope",
+          "source_ids"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scientific_question": {
+            "type": "string",
+            "minLength": 1
+          },
+          "why_now": {
+            "type": "string",
+            "minLength": 1
+          },
+          "journal_fit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "topics": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          },
+          "scope_risk": {
+            "type": "string",
+            "minLength": 1
+          },
+          "community_feasibility": {
+            "type": "string",
+            "minLength": 1
+          },
+          "research_source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          },
+          "comparisons": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "shared_problem": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "shared_methods": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "shared_applications": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "difference": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "residual_risk": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "issue_id",
+                "shared_problem",
+                "shared_methods",
+                "shared_applications",
+                "difference",
+                "residual_risk"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "overlap_risk": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "unknown"
+            ]
+          },
+          "recommendation": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "scientific_question",
+          "why_now",
+          "journal_fit",
+          "topics",
+          "scope_risk",
+          "community_feasibility",
+          "research_source_ids",
+          "comparisons",
+          "overlap_risk",
+          "recommendation"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "unresolved_questions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "next_action": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "mode",
+    "draft_stage",
+    "status",
+    "request_digest",
+    "language",
+    "journal_identity",
+    "sources",
+    "search_log",
+    "coverage",
+    "historical_issues",
+    "candidates",
+    "unresolved_questions",
+    "next_action"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

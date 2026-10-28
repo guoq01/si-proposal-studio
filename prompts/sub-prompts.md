@@ -1,3 +1,6 @@
+## Journal-first discovery sub-prompt
+For a target-journal-only request or explicit topic research, execute references/topic-discovery.md before the retrieval ranking sub-prompt. Research evidence-backed candidates, compare official SI history, await user selection, then collect writing inputs. This is Draft mode, not a fourth mode.
+
 # Sub-prompts
 
 ## Semantic style retrieval
@@ -23,7 +26,7 @@ Identify user's Type A/B label and actual files. Preserve raw sources and SHA-25
 Resolve the exact journal and its unambiguous aliases. Obtain official proposal rules plus recent official public CfP examples. Record URL, source identity, retrieval date, full supplied snapshot, publication/effective date when available, and verification method. A private case on journal letterhead is not independently official evidence. A user-pasted official extract without accessible provenance stays pending until identity/authority is established. Distinguish mandatory rules from recommendations and observed example conventions; explicitly record no stated numerical limit rather than inventing one. Isolate proposal and CfP formats. Mark unresolved contradictions; use current editor correspondence only for documented exceptions. Populate schemas/journal.schema.json and ingest Y. Archive old versions and explicitly retire old active index entries; do not leave two active matches or overwrite silently. No verification date is implied by ingestion time.
 
 ## Differentiation and self-check
-Search official same-journal calls using journal name plus topic/mechanism synonyms; include active/forthcoming calls and default last three years. Report exact comparison titles, scope evidence, dates/unknowns and nearest-neighbor overlap. Assess breadth and novelty separately. Run the rule engine, then evaluate factual support and the coherence of gap, topic list, contributions, editor expertise and outreach. A mechanical pass cannot prove any external fact. Return remaining risks and questions without fabricating reassurance.
+Search official same-journal calls using journal name plus topic/mechanism synonyms; include active/forthcoming calls and default last five years. Report exact comparison titles, scope evidence, dates/unknowns and nearest-neighbor overlap. Assess breadth and novelty separately. Run the rule engine, then evaluate factual support and the coherence of gap, topic list, contributions, editor expertise and outreach. A mechanical pass cannot prove any external fact. Return remaining risks and questions without fabricating reassurance.
 
 ## Validation records are not proposal grades
 Use evidence-backed pass/fail/pending correctness checks only within the three production modes. Never add a proposal quality score, standalone review command or grading mode. Retrieval relevance scores apply only to historical reference selection. For revisions, trace each feedback ID exactly once, include an editor_response artifact, and quote before/after text that exists in the respective source/revised proposal. A clarification_needed issue blocks ready status.

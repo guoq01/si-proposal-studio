@@ -2,7 +2,7 @@
 
 | Rule | Action | Enforced by |
 |---|---|---|
-| Required input absent/wrong type | Block; list exact field | input schema + prepare |
+| Required input absent/wrong type | Discovery requires journal only; formal writing retains full requirements | phase-specific schemas + prepare |
 | Revision/derivation source missing | Block | prepare |
 | Journal identity ambiguous, missing, expired or conflicting | Block | exact normalized name/alias lookup + date gate |
 | Journal official status only asserted in metadata | Read primary snapshot and verify provenance | host; scripts cannot prove authority |
@@ -23,3 +23,5 @@ The dependency-free validator implements the JSON Schema keywords used in this p
 
 ## Release gate upgrades
 Context is bound to request, source record and date; current active bank is rechecked. All mandatory rules and format conventions need source-linked, artifact-bound attestations at ready status. Blank sections, missing required attachments, mode/language mismatches, unresolved revisions and unsupported identity/date manifests fail. Pages/custom/unknown counters remain pending until a current measurement is recorded. Facts require claim-to-source anchors; primary-source verification is required for literature and novelty. The engine validates provenance structure, not the truth of supplied evidence.
+
+Discovery preparation is research planning, not writing readiness. The discovery checker validates evidence references, dated search categories, candidate/comparator links and uncertainty when history is missing. Semantic truth and closest-match selection remain host responsibilities. No fourth mode or proposal scoring command is added.
